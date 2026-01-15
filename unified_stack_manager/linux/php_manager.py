@@ -4,10 +4,11 @@ from lamp_manager.platform.package_manager import get_package_manager
 import subprocess
 
 class PHPManager:
-    def __init__(self, config, logger):
+    def __init__(self, config, logger, rollback):
         self.pkg_manager = get_package_manager()
         self.config = config
         self.logger = logger
+        self.rollback = rollback
         self.ppa = self.config.get('php.ppa_repository', 'ppa:ondrej/php')
 
     def _add_ppa(self) -> bool:

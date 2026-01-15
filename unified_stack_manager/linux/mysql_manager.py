@@ -81,3 +81,12 @@ class MySQLManager:
             return False
         # Aplicar los cambios
         return self._execute_query("FLUSH PRIVILEGES;")
+
+    def get_status(self) -> Dict[str, any]:
+        """Obtiene el estado del servicio MySQL."""
+        try:
+            result = subprocess.run(['systemctl', 'is-active', 'mysql'], capture_output=True, text=True)
+            is_active = result.stdout.strip() == 'active'
+            return {'is_active': is_active, 'status': result.stdout.strip()}
+        except FileNotFoundError:
+            return {'is_active': False, 'status': 'unknown', 'error': 'systemctl not found'}

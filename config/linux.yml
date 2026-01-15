@@ -1,0 +1,37 @@
+# config/linux.yml
+
+apache:
+  sites_dir: '/var/www'
+  vhosts_dir: '/etc/apache2/sites-available'
+  logs_dir: '/var/log/apache2'
+  doc_root_subdir: 'web'
+  install_packages:
+    - 'apache2'
+    - 'apache2-utils'
+    - 'libapache2-mod-fcgid'
+
+mysql:
+  # En Linux, la autenticación de root a menudo usa sockets, por lo que no se necesita password.
+  root_password: null
+  install_packages:
+    - 'mysql-server'
+
+php:
+  # El PPA de ondrej/php es específico para Debian/Ubuntu.
+  ppa_repository: 'ppa:ondrej/php'
+  # Módulos comunes para PHP en Linux
+  modules_8.2:
+    - 'php8.2'
+    - 'php8.2-cli'
+    - 'php8.2-fpm'
+    - 'php8.2-mysql'
+    - 'php8.2-gd'
+    - 'php8.2-xml'
+    - 'php8.2-curl'
+    - 'php8.2-mbstring'
+    - 'php8.2-zip'
+    - 'php8.2-intl'
+
+# Rutas para herramientas en un entorno Linux estándar.
+composer_path: '/usr/local/bin/composer'
+drush_path: '~/.composer/vendor/bin/drush'

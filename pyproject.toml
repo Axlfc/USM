@@ -1,0 +1,41 @@
+# pyproject.toml
+
+[project]
+name = "unified-stack-manager"
+version = "1.0.0"
+description = "Herramienta para gestionar stacks WAMP/LAMP de forma unificada."
+authors = [
+    { name = "Your Name", email = "you@example.com" },
+]
+license = { text = "MIT" }
+readme = "README.md"
+requires-python = ">=3.8"
+
+dependencies = [
+    "pyyaml>=6.0",
+    "click>=8.1",
+]
+
+[project.optional-dependencies]
+windows = [
+    "pywin32>=305",
+    "wmi>=1.5.1",
+]
+linux = [
+    "psutil>=5.9",
+]
+
+[project.scripts]
+# Define los comandos que estarán disponibles en la terminal
+# al instalar el paquete.
+usm = "unified_stack_manager.cli:main"
+unified-stack-manager = "unified_stack_manager.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["unified_stack_manager*"]
+exclude = ["tests*"]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"

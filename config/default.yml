@@ -1,0 +1,18 @@
+# config/default.yml
+
+php:
+  supported_versions: ['7.4', '8.1', '8.2', '8.3']
+  default_version: '8.2'
+
+drupal:
+  default_profile: 'standard'
+  default_version: '^10'
+  # El path de composer y drush puede variar, se puede sobreescribir
+  # en los archivos de config específicos de cada OS.
+  composer_path: 'composer'
+  drush_path: 'drush'
+
+security:
+  require_sudo: True
+  backup_before_changes: True
+  dry_run_by_default: False
