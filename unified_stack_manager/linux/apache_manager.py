@@ -85,3 +85,12 @@ class ApacheManager:
     def reload_service(self) -> bool:
         """Recarga la configuración de Apache sin reiniciar."""
         return self.manage_service('reload')
+
+    def get_status(self) -> Dict[str, any]:
+        """Obtiene el estado del servicio Apache."""
+        try:
+            result = subprocess.run(['systemctl', 'is-active', 'apache2'], capture_output=True, text=True)
+            is_active = result.stdout.strip() == 'active'
+            return {'is_active': is_active, 'status': result.stdout.strip()}
+        except FileNotFoundError:
+            return {'is_active': False, 'status': 'unknown', 'error': 'systemctl not found'}
