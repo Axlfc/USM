@@ -64,12 +64,14 @@ Para una guía paso a paso detallada en Windows, consulta: [GUIA_DETALLADA_WINDO
 | `ai_provider_ollama` | Soporte para LLMs locales (Llama 3, etc.). |
 | `mcp` | Model Context Protocol para herramientas externas. |
 | `langfuse` | Observabilidad y trazabilidad de prompts. |
+| `ckeditor5_markdown` | Soporte de Markdown (autoformateo y pegado) en CKEditor 5. |
 
 ---
 
 ## 🛠️ Comandos Principales
 
-- `usm create-site [SITE_NAME] --ai`: Despliegue completo con IA.
+- `usm create-site [SITE_NAME] --ai`: Despliegue completo con IA. Incluye soporte de Markdown en CKEditor 5 por defecto.
+- `usm enable-markdown [SITE_NAME]`: Habilita el soporte de Markdown en un sitio existente.
 - `usm verify-ai --site [SITE_NAME]`: Diagnóstico técnico del entorno de IA.
 - `usm status`: Muestra el estado de los servicios (Apache, MySQL, PHP).
 - `usm switch-php [SITE_NAME] [VERSION]`: Cambia la versión de PHP del sitio.

@@ -80,6 +80,7 @@ usm verify-ai --site mi-sitio-ai.local
 - Core: `ai`, `key`, `ai_agents`, `ai_automators`, `ai_assistants_api`.
 - Funcionalidad: `ai_chatbot`, `ai_content_suggestions`, `ai_translate`, `ai_seo`.
 - Proveedores: `ai_provider_openai`, `ai_provider_ollama`, `ai_provider_anthropic`, `ai_provider_google`.
+- UX: `ckeditor5_markdown`.
 
 **Salida esperada:**
 ```text
@@ -94,6 +95,15 @@ usm verify-ai --site mi-sitio-ai.local
 ```
 
 ## 6. Uso de Funcionalidades de IA
+
+### Soporte de Markdown en CKEditor 5
+El sistema incluye soporte para **Markdown** en tiempo real y pegado inteligente:
+- **Autoformateo:** Escribe sintaxis Markdown (ej: `# Título`, `**negrita**`) y CKEditor lo convertirá visualmente a HTML de forma instantánea.
+- **Pegado de Markdown:** Pega texto en formato Markdown directamente en el editor y se convertirá a contenido enriquecido (HTML).
+- **Habilitación manual:** Si tienes un sitio existente, puedes activar esta función con:
+  ```bash
+  usm enable-markdown mi-sitio.local
+  ```
 
 ### Creación de Contenido Automático (Dynamic AI Blog)
 El sistema intenta generar contenido dinámico si detecta API Keys:

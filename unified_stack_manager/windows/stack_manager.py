@@ -184,7 +184,8 @@ class WindowsStackManager(BaseStackManager):
                     "ai_image_alt_text", "ai_media_image", "ai_seo",
                     "mcp", "model_context_protocol", "langfuse",
                     "ai_provider_openai", "ai_provider_ollama",
-                    "ai_provider_anthropic", "ai_provider_google"
+                    "ai_provider_anthropic", "ai_provider_google",
+                    "ckeditor5_markdown"
                 ]
                 for mod in required_modules:
                     status = "✅" if mod in enabled_modules else "❌"
@@ -275,3 +276,43 @@ class WindowsStackManager(BaseStackManager):
     def get_site_path(self, site_name: str) -> Path:
         base_path = self.config.get('apache.sites_dir', 'C:/APACHE24/htdocs')
         return Path(base_path) / site_name
+
+    def enable_markdown(self, site_name: str) -> bool:
+        """Habilita el soporte de Markdown para un sitio existente en Windows."""
+        print(f"🚀 Habilitando soporte de Markdown para el sitio '{site_name}' en Windows...")
+        site_path = self.get_site_path(site_name)
+
+        if not site_path.exists():
+            print(f"❌ Error: El sitio '{site_name}' no existe en {site_path}")
+            return False
+
+        if self.dry_run:
+            print(f"🔍 DRY RUN: Se instalaría drupal/ckeditor5_markdown y se configuraría en {site_name}")
+            return True
+
+        try:
+            # 1. Composer require
+            print("📦 Descargando módulo ckeditor5_markdown...")
+            composer_cmd = [self.drupal_manager.php_exe_path, self.drupal_manager.composer_path, "require", "drupal/ckeditor5_markdown", "--no-interaction"]
+            if not self.drupal_manager._run_command(composer_cmd, site_path):
+                print("❌ Falló la descarga del módulo.")
+                return False
+
+            # 2. Drush enable
+            print("🔌 Activando módulo ckeditor5_markdown...")
+            drush_path = site_path / "vendor" / "bin" / "drush"
+            en_cmd = [self.drupal_manager.php_exe_path, str(drush_path), "en", "ckeditor5_markdown", "-y"]
+            if not self.drupal_manager._run_command(en_cmd, site_path / "web"):
+                print("❌ Falló la activación del módulo.")
+                return False
+
+            # 3. Configurar
+            self.drupal_manager._configure_markdown_support(site_path)
+
+            self._log_operation('enable_markdown', site_name)
+            print(f"✅ Soporte de Markdown habilitado correctamente para '{site_name}'.")
+            return True
+
+        except Exception as e:
+            print(f"❌ Error al habilitar Markdown: {e}")
+            return False

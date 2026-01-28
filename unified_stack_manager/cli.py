@@ -133,6 +133,17 @@ def verify_ai(ctx, site):
     except Exception as e:
         handle_exception(e, ctx.obj['verbose'])
 
+@cli.command('enable-markdown')
+@click.argument('site_name')
+@click.pass_context
+def enable_markdown(ctx, site_name):
+    """Habilitar el soporte de Markdown en CKEditor para un sitio existente."""
+    manager = ctx.obj['manager']
+    try:
+        manager.enable_markdown(site_name=site_name)
+    except Exception as e:
+        handle_exception(e, ctx.obj['verbose'])
+
 @cli.command()
 @click.pass_context
 def status(ctx):

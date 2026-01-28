@@ -2,6 +2,7 @@
 import os
 import secrets
 import string
+import subprocess
 from pathlib import Path
 from typing import List, Dict
 
@@ -154,10 +155,11 @@ class LinuxStackManager(BaseStackManager):
                 "drupal/ai:^1.3@beta", "drupal/key", "drupal/ai_agents",
                 "drupal/ai_simple_pdf_to_text:^1.0@alpha", "drupal/tool:^1.0@alpha",
                 "drupal/ai_automators", "drupal/ai_assistants_api", "drupal/ai_chatbot",
-                "drupal/ai_content_suggestions", "drupal/ai_translate", "drupal/ai_search",
+                "drupal/ai_ckeditor", "drupal/ai_content_suggestions", "drupal/ai_translate", "drupal/ai_search",
                 "drupal/ai_image_alt_text", "drupal/ai_media_image", "drupal/ai_seo",
                 "drupal/mcp", "drupal/langfuse", "drupal/ai_provider_openai",
-                "drupal/ai_provider_ollama", "drupal/ai_provider_anthropic", "drupal/ai_provider_google"
+                "drupal/ai_provider_ollama", "drupal/ai_provider_anthropic", "drupal/ai_provider_google",
+                "drupal/ckeditor5_markdown"
             ]
             # Ejecutar todos en un solo comando para mayor eficiencia
             subprocess.run(["composer", "require"] + ai_modules + ["--no-interaction"], cwd=doc_root, check=False)
@@ -182,7 +184,8 @@ class LinuxStackManager(BaseStackManager):
                 "ai_content_suggestions", "ai_translate", "ai_search", "ai_logging",
                 "ai_observability", "ai_image_alt_text", "ai_media_image", "ai_seo",
                 "mcp", "model_context_protocol", "langfuse", "ai_provider_openai",
-                "ai_provider_ollama", "ai_provider_anthropic", "ai_provider_google"
+                "ai_provider_ollama", "ai_provider_anthropic", "ai_provider_google",
+                "ckeditor5_markdown"
             ]
             subprocess.run(["php", str(drush_path), "en"] + enable_modules + ["-y"], cwd=doc_root / "web", check=False)
 
@@ -191,6 +194,34 @@ class LinuxStackManager(BaseStackManager):
 
             # Crear Blog
             self._create_sample_blog(doc_root)
+
+            # Configurar Markdown en CKEditor
+            self._configure_markdown_support(doc_root)
+
+    def _configure_markdown_support(self, doc_root: Path):
+        """Configura el plugin de Markdown en los formatos de texto de CKEditor 5."""
+        print("📝 Configurando soporte de Markdown en CKEditor 5...")
+        drush_path = doc_root / "vendor" / "bin" / "drush"
+
+        script = """
+        $formats = ['basic_html', 'full_html'];
+        foreach ($formats as $format_id) {
+            $editor = \\Drupal\\editor\\Entity\\Editor::load($format_id);
+            if ($editor && $editor->getEditor() == 'ckeditor5') {
+                $settings = $editor->getSettings();
+                // Habilitar el plugin de Markdown si no está habilitado
+                if (!isset($settings['plugins']['ckeditor5_markdown_markdown'])) {
+                    $settings['plugins']['ckeditor5_markdown_markdown'] = ['enabled' => true];
+                    $editor->setSettings($settings);
+                    $editor->save();
+                    echo "✅ Markdown habilitado para el formato: $format_id\\n";
+                } else {
+                    echo "ℹ️ Markdown ya estaba habilitado para el formato: $format_id\\n";
+                }
+            }
+        }
+        """
+        subprocess.run(["php", str(drush_path), "php:eval", script], cwd=doc_root / "web", check=False)
 
     def _create_env_example(self, doc_root: Path):
         print("📄 Creando .env.example...")
@@ -426,7 +457,8 @@ OLLAMA_BASE_URL="http://localhost:11434"
                     "ai_image_alt_text", "ai_media_image", "ai_seo",
                     "mcp", "model_context_protocol", "langfuse",
                     "ai_provider_openai", "ai_provider_ollama",
-                    "ai_provider_anthropic", "ai_provider_google"
+                    "ai_provider_anthropic", "ai_provider_google",
+                    "ckeditor5_markdown"
                 ]
                 for mod in required_modules:
                     status = "✅" if mod in enabled_modules else "❌"
@@ -518,3 +550,38 @@ OLLAMA_BASE_URL="http://localhost:11434"
 
     def get_site_path(self, site_name: str) -> Path:
         return Path(self.config.get('apache.sites_dir')) / site_name
+
+    def enable_markdown(self, site_name: str) -> bool:
+        """Habilita el soporte de Markdown para un sitio existente en Linux."""
+        print(f"🚀 Habilitando soporte de Markdown para el sitio '{site_name}'...")
+        site_path = self.get_site_path(site_name)
+
+        if not site_path.exists():
+            print(f"❌ Error: El sitio '{site_name}' no existe en {site_path}")
+            return False
+
+        if self.dry_run:
+            print(f"🔍 DRY RUN: Se instalaría drupal/ckeditor5_markdown y se configuraría en {site_name}")
+            return True
+
+        try:
+            drush_path = site_path / "vendor" / "bin" / "drush"
+
+            # 1. Composer require
+            print("📦 Descargando módulo ckeditor5_markdown...")
+            subprocess.run(["composer", "require", "drupal/ckeditor5_markdown", "--no-interaction"], cwd=site_path, check=True)
+
+            # 2. Drush enable
+            print("🔌 Activando módulo ckeditor5_markdown...")
+            subprocess.run(["php", str(drush_path), "en", "ckeditor5_markdown", "-y"], cwd=site_path / "web", check=True)
+
+            # 3. Configurar
+            self._configure_markdown_support(site_path)
+
+            self._log_operation('enable_markdown', site_name)
+            print(f"✅ Soporte de Markdown habilitado correctamente para '{site_name}'.")
+            return True
+
+        except Exception as e:
+            print(f"❌ Error al habilitar Markdown: {e}")
+            return False
