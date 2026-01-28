@@ -78,7 +78,7 @@ class LinuxStackManager(BaseStackManager):
             self.rollback.revert()
             return False
 
-    def create_drupal_site(self, site_name: str, php_version: str, drupal_version: str) -> bool:
+    def create_drupal_site(self, site_name: str, php_version: str, drupal_version: str, ai_mode: bool = False) -> bool:
         """Crea un nuevo sitio Drupal (vhost, directorio, BD)."""
         # TODO: Integrar la lógica real de creación de Drupal.
         # La lógica actual es un placeholder adaptado del antiguo create_site.

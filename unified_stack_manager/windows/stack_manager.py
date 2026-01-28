@@ -41,7 +41,7 @@ class WindowsStackManager(BaseStackManager):
         print("No se especificó 'php' o 'all', no se realiza ninguna acción de instalación.")
         return True
 
-    def create_drupal_site(self, site_name: str, php_version: str, drupal_version: str) -> bool:
+    def create_drupal_site(self, site_name: str, php_version: str, drupal_version: str, ai_mode: bool = False) -> bool:
         """Crea un nuevo sitio Drupal coordinando los gestores legacy."""
         print(f"Iniciando la creación del sitio Drupal '{site_name}' en Windows...")
 
@@ -72,7 +72,7 @@ class WindowsStackManager(BaseStackManager):
 
         # Paso 3: Crear el sitio Drupal usando el gestor legacy
         print("Ejecutando el proceso de creación de Drupal (Composer y Drush)...")
-        if not self.drupal_manager.create_site(site_name, drupal_version):
+        if not self.drupal_manager.create_site(site_name, drupal_version, ai_mode=ai_mode):
             print("Error: El DrupalManager legacy falló al crear el sitio.")
             # TODO: Añadir lógica de rollback para la base de datos si esto falla.
             return False
