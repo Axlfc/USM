@@ -1,5 +1,6 @@
 # unified_stack_manager/linux/mysql_manager.py
 
+from typing import Dict
 from unified_stack_manager.platform.package_manager import get_package_manager
 import subprocess
 

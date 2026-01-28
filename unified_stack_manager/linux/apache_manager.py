@@ -2,6 +2,7 @@
 
 import subprocess
 from pathlib import Path
+from typing import Dict
 from unified_stack_manager.platform.package_manager import get_package_manager
 
 class ApacheManager:

@@ -82,7 +82,10 @@ class DrupalManager:
             # Step 6: Create sample blog
             self._create_sample_blog(project_path)
 
-        # Step 7: Verify installation
+            # Step 7: Configure Markdown in CKEditor
+            self._configure_markdown_support(project_path)
+
+        # Step 8: Verify installation
         self._verify_installation(project_path)
 
         self.log(f"Successfully processed Drupal site: {project_name}", "INFO")
@@ -163,7 +166,8 @@ class DrupalManager:
             "drupal/ai_provider_openai",
             "drupal/ai_provider_ollama",
             "drupal/ai_provider_anthropic",
-            "drupal/ai_provider_google"
+            "drupal/ai_provider_google",
+            "drupal/ckeditor5_markdown"
         ]
 
         for module in modules:
@@ -222,7 +226,8 @@ class DrupalManager:
             "ai_provider_openai",
             "ai_provider_ollama",
             "ai_provider_anthropic",
-            "ai_provider_google"
+            "ai_provider_google",
+            "ckeditor5_markdown"
         ]
 
         # Enable them one by one or in small groups to avoid memory issues and identify failures
@@ -341,6 +346,32 @@ class DrupalManager:
             return True
 
         return False
+
+    def _configure_markdown_support(self, project_path):
+        """Configures the Markdown plugin in CKEditor 5 text formats."""
+        self.log("Configuring Markdown support in CKEditor 5...")
+        drush_path = project_path / "vendor" / "bin" / "drush"
+
+        script = """
+        $formats = ['basic_html', 'full_html'];
+        foreach ($formats as $format_id) {
+            $editor = \\Drupal\\editor\\Entity\\Editor::load($format_id);
+            if ($editor && $editor->getEditor() == 'ckeditor5') {
+                $settings = $editor->getSettings();
+                // Enable the Markdown plugin if it is not enabled
+                if (!isset($settings['plugins']['ckeditor5_markdown_markdown'])) {
+                    $settings['plugins']['ckeditor5_markdown_markdown'] = ['enabled' => true];
+                    $editor->setSettings($settings);
+                    $editor->save();
+                    echo "✅ Markdown enabled for format: $format_id\\n";
+                } else {
+                    echo "ℹ️ Markdown was already enabled for format: $format_id\\n";
+                }
+            }
+        }
+        """
+        command = [self.php_exe_path, str(drush_path), "php:eval", script]
+        return self._run_command(command, project_path / "web")
 
     def _create_env_example(self, project_path):
         """Creates a .env.example file with API key placeholders."""

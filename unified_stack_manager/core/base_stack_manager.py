@@ -55,6 +55,11 @@ class BaseStackManager(ABC):
         """Retorna el path del sitio"""
         pass
 
+    @abstractmethod
+    def enable_markdown(self, site_name: str) -> bool:
+        """Habilita el soporte de Markdown para un sitio existente"""
+        pass
+
     def _log_operation(self, action: str, target: str, details: Dict = None):
         """Helper para logging consistente"""
         import os
