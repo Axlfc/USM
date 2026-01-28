@@ -85,15 +85,17 @@ def install(ctx, components):
 @click.argument('site_name')
 @click.option('--php-version', default='8.4', type=click.Choice(['7.4', '8.1', '8.2', '8.3', '8.4']), help='Versión de PHP')
 @click.option('--drupal-version', default='^11', help='Versión de Drupal (ej: ^11, 11.0.0)')
+@click.option('--ai', is_flag=True, help='Habilitar la automatización de módulos de IA')
 @click.pass_context
-def create_site(ctx, site_name, php_version, drupal_version):
+def create_site(ctx, site_name, php_version, drupal_version, ai):
     """Crear un nuevo sitio Drupal."""
     manager = ctx.obj['manager']
     try:
         manager.create_drupal_site(
             site_name=site_name,
             php_version=php_version,
-            drupal_version=drupal_version
+            drupal_version=drupal_version,
+            ai_mode=ai
         )
     except Exception as e:
         handle_exception(e, ctx.obj['verbose'])

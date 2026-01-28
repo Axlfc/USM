@@ -26,7 +26,7 @@ class BaseStackManager(ABC):
         pass
 
     @abstractmethod
-    def create_drupal_site(self, site_name: str, php_version: str, drupal_version: str) -> bool:
+    def create_drupal_site(self, site_name: str, php_version: str, drupal_version: str, ai_mode: bool = False) -> bool:
         """Crea un nuevo sitio Drupal"""
         pass
 
